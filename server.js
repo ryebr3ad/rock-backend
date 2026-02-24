@@ -22,11 +22,21 @@ try {
     console.error(`Error reading count file: ${err}`);
 }
 
-app.get('/status', (req, res) => {
+const validateKey = (req, res, next) => {
+    const userKey = req.headers('x-api-key');
+    if(userKey === process.env.API_SECRET_KEY) {
+	next();
+    }
+    else {
+	res.status(403).json({error: 'Forbidden: Invalid API Key" '});
+    }
+}
+
+app.get('/status', validateKey, (req, res) => {
     res.json({message: `${rockCount} total rock${rockCount === 1 ? '' : 's'} produced`});
 });
 
-app.post('/add-rock', (req, res) => {
+app.post('/add-rock', validateKey, (req, res) => {
     rockCount++;
 
     fs.writeFile(dataPath, rockCount.toString(), (err) => {
