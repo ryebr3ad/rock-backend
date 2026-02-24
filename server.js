@@ -3,12 +3,13 @@ const cors = require('cors');
 const app = express();
 const fs = require('fs');
 const path = require('path');
-const PORT = 3000;
+require('dotenv').config();
+
+const PORT = process.env.PORT || 3000;
+const dataPath = path.join(__dirname, process.env.DATA_FILE || 'count.txt');
 
 app.use(cors());
 app.use(express.json());
-
-const dataPath = path.join(__dirname, 'count.txt');
 
 let rockCount = 0;
 try {
