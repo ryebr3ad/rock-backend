@@ -34,10 +34,15 @@ app.get('/status', validateKey, (req, res) => {
 });
 
 app.post('/add-rock', validateKey, (req, res) => {
-    rockCount++;
 
-    db.run("UPDATE stats SET value = ? WHERE key = 'global_count'", [rockCount], (err) => {
-	if (err) console.error("DB Error:", err.message);
+    const sql = "UPDATE stats SET value = value + 1 WHERE key = 'global_count' RETURNING value"
+
+    db.get(sql, [], (err, row) => {
+	if (err) {
+	    return res.status(500).json({error:err.message});
+	}
+	console.log(`rock added at ${new Date().toString()}`);
+	rockCount = row.value;
     });
     
     res.json({success: true, total: rockCount});
