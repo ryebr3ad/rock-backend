@@ -53,7 +53,7 @@ app.post('/add-rock', validateKey, (req, res) => {
             return res.status(500).json({ error: err.message });
         }
         console.log(`rock added at ${new Date().toString()}`);
-        io.emit('rock made', 'rock made');
+
         rockCount = row.value;
     });
 
@@ -63,7 +63,7 @@ app.post('/add-rock', validateKey, (req, res) => {
 io.on('connection', (socket) => {
     console.log('client connected');
     socket.on('new-rock-client', (rock) => {
-	io.emit('new-rock-server', rock);
+        server.broadcast.emit('new-rock-server', rock);
     });
 });
 
