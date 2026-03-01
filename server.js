@@ -62,9 +62,9 @@ app.post('/add-rock', validateKey, (req, res) => {
 
 io.on('connection', (socket) => {
     console.log('client connected');
-    socket.on('new-rock', (rock) => {
-	socket.broadcast.emit('new-rock', rock);
-    })
+    socket.on('new-rock-client', (rock) => {
+	io.emit('new-rock-server', rock);
+    });
 });
 
 server.listen(PORT, () => {
