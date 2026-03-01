@@ -3,7 +3,15 @@ const cors = require('cors');
 const app = express();
 const path = require('path');
 const sqlite = require('sqlite3').verbose();
+const http = require('http');
+
 const db = new sqlite.Database(path.join(__dirname, 'rocks.db'));
+const { Server } = require('socket.io');
+
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: { origin: "https://ryes.rocks" }
+});
 
 require('dotenv').config();
 
@@ -21,16 +29,16 @@ db.get("SELECT value FROM stats WHERE key = 'global_count'", (err, row) => {
 
 const validateKey = (req, res, next) => {
     const userKey = req.headers['x-api-key'];
-    if(userKey === process.env.API_SECRET_KEY) {
-	next();
+    if (userKey === process.env.API_SECRET_KEY) {
+        next();
     }
     else {
-	res.status(403).json({error: 'Forbidden: Invalid API Key'});
+        res.status(403).json({ error: 'Forbidden: Invalid API Key' });
     }
 }
 
 app.get('/status', validateKey, (req, res) => {
-    res.json({message: `${rockCount} total rock${rockCount === 1 ? '' : 's'} produced`});
+    res.json({ message: `${rockCount} total rock${rockCount === 1 ? '' : 's'} produced` });
 });
 
 app.post('/add-rock', validateKey, (req, res) => {
@@ -38,14 +46,15 @@ app.post('/add-rock', validateKey, (req, res) => {
     const sql = "UPDATE stats SET value = value + 1 WHERE key = 'global_count' RETURNING value"
 
     db.get(sql, [], (err, row) => {
-	if (err) {
-	    return res.status(500).json({error:err.message});
-	}
-	console.log(`rock added at ${new Date().toString()}`);
-	rockCount = row.value;
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        console.log(`rock added at ${new Date().toString()}`);
+        io.emit('rock made');
+        rockCount = row.value;
     });
-    
-    res.json({success: true, total: rockCount});
+
+    res.json({ success: true, total: rockCount });
 });
 
 app.listen(PORT, () => {
