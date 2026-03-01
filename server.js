@@ -45,7 +45,6 @@ app.get('/status', validateKey, (req, res) => {
 });
 
 app.post('/add-rock', validateKey, (req, res) => {
-    console.log(req.body);
 
     const sql = "UPDATE stats SET value = value + 1 WHERE key = 'global_count' RETURNING value"
 
@@ -59,6 +58,13 @@ app.post('/add-rock', validateKey, (req, res) => {
     });
 
     res.json({ success: true, total: rockCount });
+});
+
+io.on('connection', (socket) => {
+    console.log('client connected');
+    socket.on('new-rock', (rock) => {
+	socket.broadcast.emit('new-rock', rock);
+    })
 });
 
 server.listen(PORT, () => {
