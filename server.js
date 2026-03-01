@@ -9,13 +9,7 @@ const db = new sqlite.Database(path.join(__dirname, 'rocks.db'));
 const { Server } = require('socket.io');
 
 const server = http.createServer(app);
-const io = new Server(server, {
-    path: "/api/socket.io", // Matches the frontend
-    cors: {
-        origin: "https://ryes.rocks",
-        methods: ["GET", "POST"]
-    }
-});
+const io = new Server(server);
 
 require('dotenv').config();
 
