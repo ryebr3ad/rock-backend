@@ -46,6 +46,8 @@ app.get('/status', validateKey, (req, res) => {
 
 app.post('/add-rock', validateKey, (req, res) => {
 
+    let { x, y } = req.body;
+
     const sql = "UPDATE stats SET value = value + 1 WHERE key = 'global_count' RETURNING value"
 
     db.get(sql, [], (err, row) => {
@@ -53,7 +55,7 @@ app.post('/add-rock', validateKey, (req, res) => {
             return res.status(500).json({ error: err.message });
         }
         console.log(`rock added at ${new Date().toString()}`);
-        io.emit('rock made', 'rock made');
+        io.emit('rock made', { x, y });
         rockCount = row.value;
     });
 
