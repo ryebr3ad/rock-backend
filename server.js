@@ -55,6 +55,6 @@ app.post('/add-rock', validateKey, (req, res) => {
     res.json({ success: true, total: rockCount });
 });
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Backend running on port ${PORT}`);
 });
