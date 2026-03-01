@@ -53,7 +53,7 @@ app.post('/add-rock', validateKey, (req, res) => {
             return res.status(500).json({ error: err.message });
         }
         console.log(`rock added at ${new Date().toString()}`);
-        io.emit('rock made');
+        io.emit('rock made', 'rock made');
         rockCount = row.value;
     });
 
